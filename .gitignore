@@ -2,3 +2,4 @@
 venv/
 guru.crx
 .idea/
+__pycache__/
