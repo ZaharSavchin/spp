@@ -30,11 +30,14 @@ def open_widget(browser):
 with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install()), options=options_chrome) as browser:
     url = f'https://www.wildberries.ru/catalog/{arts[3]}/detail.aspx'
     browser.get(url)
-    time.sleep(30)
+    time.sleep(5)
 
     browser.switch_to.window(browser.window_handles[1])
 
-    tru(browser)
+    try:
+        tru(browser)
+    except Exception as err:
+        print(err)
 
     browser.switch_to.window(browser.window_handles[0])
 
