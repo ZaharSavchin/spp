@@ -9,8 +9,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import speech_recognition as sr
 
 name_audio_file = 'audio_captcha.mp3'
-login = 'pasechnik.pchelovod@mail.ru'
-password = 'Pchelovod17'
+login = '*************'
+password = '************'
 
 
 def write_audio(url):
