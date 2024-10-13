@@ -50,18 +50,24 @@ with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install()), 
             try:
                 price_wb = browser.find_element(By.CLASS_NAME, "price-block__final-price").text
                 price_wb = ''.join(price_wb.split(' ')[:-1])
-                price_with_spp.append(int(price_wb))
+                price_wb = int(price_wb)
             except Exception as err:
                 price_wb = None
-                price_with_spp.append(None)
 
             try:
                 price_no_spp = browser.find_element(By.CLASS_NAME, "SppWidget_sppWidget__boldPrice__0J7RF").text
                 price_no_spp = ''.join(price_no_spp.split(' ')[:-1])
-                price.append(int(price_no_spp))
+                price_no_spp = int(price_no_spp)
             except Exception as err:
                 price_no_spp = None
-                price.append(None)
+
+            try:
+                sold_out = browser.find_element(By.CLASS_NAME, 'sold-out-product')
+                price_with_spp.append(' ')
+                price.append(' ')
+            except Exception as err:
+                price_with_spp.append(price_wb)
+                price.append(price_no_spp)
 
             try:
                 sold_items = browser.find_element(By.CLASS_NAME, "ShortWidgetStat_shortWidgetStatColumn__nzQOE").text
@@ -78,7 +84,7 @@ with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install()), 
                 backs = None
                 fidbacks.append(None)
 
-            print(f'{art} = {price_no_spp}р, {sold_items}, {backs}')
+            print(f'{art} = {price_wb}, {price_no_spp}р, {sold_items}, {backs}')
 
 
 for i in range(len(price_with_spp)):

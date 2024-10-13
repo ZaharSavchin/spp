@@ -9,8 +9,8 @@ from selenium.webdriver.support import expected_conditions as EC
 import speech_recognition as sr
 
 name_audio_file = 'audio_captcha.mp3'
-login = '*************'
-password = '************'
+login = 'pasechnik.pchelovod@mail.ru'
+password = 'Pchelovod17'
 
 
 def write_audio(url):
@@ -35,8 +35,8 @@ def audio_to_text():
 
 def tru(browser):
     time.sleep(5)
-    browser.find_element(By.CLASS_NAME, "header-nav__buttons").find_element(By.TAG_NAME, 'a').click()
-    # browser.find_element(By.XPATH, '/html/body/app-root/app-extension/div/app-extension-main/div/div/div/div[1]/div[3]/div/a[2]').click()
+    # browser.find_element(By.CLASS_NAME, "header-nav__buttons").find_element(By.TAG_NAME, 'a').click()
+    browser.find_element(By.XPATH, '/html/body/app-root/app-extension/div/app-extension-main/div/div/div/div[1]/div[3]/div/a[2]').click()
     # browser.find_element(By.CLASS_NAME, "btn btn-dark").click()
     # time.sleep(5)
     # time.sleep(10)
