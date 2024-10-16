@@ -27,7 +27,7 @@ def open_widget(browser):
     browser.find_element(By.CLASS_NAME, "WidgetButton_widgetButtonOpenIcon__uuM6O").click()
 
 
-with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install()), options=options_chrome) as browser:
+with webdriver.Chrome(options=options_chrome) as browser:
     url = f'https://www.wildberries.ru/catalog/{arts[3]}/detail.aspx'
     browser.get(url)
     time.sleep(5)
@@ -45,11 +45,14 @@ with webdriver.Chrome(service=ChromiumService(ChromeDriverManager().install()), 
     open_widget(browser)
     for art in arts:
             browser.get(f'https://www.wildberries.ru/catalog/{art}/detail.aspx')
+            browser.maximize_window()
             time.sleep(5)
 
             try:
-                price_wb = browser.find_element(By.CLASS_NAME, "price-block__final-price").text
+                price_wb = browser.find_element(By.XPATH, "/html/body/div[1]/main/div[2]/div/div[3]/div/div[3]/div[14]/div/div[1]/div[1]/div[1]/div/div/p/span/ins").text
+
                 price_wb = ''.join(price_wb.split(' ')[:-1])
+                print(f'....{price_wb}...')
                 price_wb = int(price_wb)
             except Exception as err:
                 price_wb = None
