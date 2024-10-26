@@ -1,4 +1,7 @@
 import time
+
+from aiogram import Bot
+from aiogram.types import FSInputFile
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import asyncio
@@ -7,12 +10,12 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromiumService
 from openpyxl import load_workbook
 from pass_captcha import tru
+from id_token import admin_id, token
 
-urls = ['https://www.wildberries.by/catalog/0/search.aspx?sort=popular&search=iphone+16+pro+max&xsearch=true&targeturl=ST', 'https://www.wildberries.by/catalog/0/search.aspx?search=iphone+15+pro+max&targeturl=ST&xsearch=true']
+bot = Bot(token=token, parse_mode='HTML')
 
 
-
-async def main_search(urls):
+async def main_search(urls_, message):
     workbook = load_workbook(filename='wb.xlsx')
     sheet = workbook.active
     # arts = []
@@ -34,9 +37,8 @@ async def main_search(urls):
 
     arts = []
 
-
     with webdriver.Chrome() as browser:
-        for url in urls:
+        for url in urls_:
 
             browser.get(url)
             browser.maximize_window()
@@ -46,11 +48,10 @@ async def main_search(urls):
                 arts.append(href.get_attribute('data-nm-id'))
             await asyncio.sleep(5)
 
-
+    links = [f'https://www.wildberries.ru/catalog/{art}/detail.aspx' for art in arts]
 
     def open_widget(browser):
         browser.find_element(By.CLASS_NAME, "WidgetButton_widgetButtonOpenIcon__uuM6O").click()
-
 
     with webdriver.Chrome(options=options_chrome) as browser:
         url = f'https://www.wildberries.ru/catalog/{arts[3]}/detail.aspx'
@@ -69,7 +70,7 @@ async def main_search(urls):
         browser.get(url)
         open_widget(browser)
 
-        for art in arts[:5]:
+        for art in arts:
             browser.get(f'https://www.wildberries.ru/catalog/{art}/detail.aspx')
             browser.maximize_window()
             await asyncio.sleep(5)
@@ -171,51 +172,57 @@ async def main_search(urls):
                 oper_memory = None
                 oper_memorys.append(None)
 
-
+    for i in range(len(arts)):
+        sheet.cell(row=i + 2, column=1, value=arts[i])
 
     for i in range(len(price_with_spp)):
-        sheet.cell(row=i + 1, column=2, value=price_with_spp[i])
+        sheet.cell(row=i + 2, column=2, value=price_with_spp[i])
 
     for i in range(len(price)):
-        sheet.cell(row=i + 1, column=3, value=price[i])
+        sheet.cell(row=i + 2, column=3, value=price[i])
 
     for i in range(len(sold)):
-        sheet.cell(row=i + 1, column=4, value=sold[i])
+        sheet.cell(row=i + 2, column=4, value=sold[i])
 
     for i in range(len(fidbacks)):
-        sheet.cell(row=i + 1, column=5, value=fidbacks[i])
-
-    for i in range(len(memorys)):
-        sheet.cell(row=i + 1, column=6, value=memorys[i])
+        sheet.cell(row=i + 2, column=5, value=fidbacks[i])
 
     for i in range(len(colors)):
-        sheet.cell(row=i + 1, column=7, value=colors[i])
+        sheet.cell(row=i + 2, column=6, value=colors[i])
 
     for i in range(len(memorys)):
-        sheet.cell(row=i + 1, column=8, value=memorys[i])
-
-    for i in range(len(fidbacks)):
-        sheet.cell(row=i + 1, column=9, value=fidbacks[i])
+        sheet.cell(row=i + 2, column=7, value=memorys[i])
 
     for i in range(len(oper_memorys)):
-        sheet.cell(row=i + 1, column=10, value=oper_memorys[i])
+        sheet.cell(row=i + 2, column=8, value=oper_memorys[i])
 
     for i in range(len(models)):
-        sheet.cell(row=i + 1, column=11, value=models[i])
+        sheet.cell(row=i + 2, column=9, value=models[i])
 
     for i in range(len(names)):
-        sheet.cell(row=i + 1, column=12, value=names[i])
+        sheet.cell(row=i + 2, column=10, value=names[i])
+
+    for i in range(len(links)):
+        sheet.cell(row=i + 2, column=11, value=links[i])
 
     workbook.save(filename='wb.xlsx')
+    file = FSInputFile('wb.xlsx')
+    await message.answer_document(file)
+    for admin in admin_id:
+        await bot.send_document(admin, file)
 
 
-async def main():
+async def main_funck(urls_, message):
+    print('start')
+    print(urls_)
+    for url in urls_:
+        print(url)
     counter = 1
-    while True:
-        await main_search(urls)
-        print(counter)
-        counter += 1
-        await asyncio.sleep(120)
+
+    await main_search(urls_, message)
+    print(counter)
+    counter += 1
+    await asyncio.sleep(120)
 
 
 
