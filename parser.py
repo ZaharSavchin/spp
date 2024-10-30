@@ -1,11 +1,12 @@
 import time
-
+from selenium.webdriver.support import expected_conditions as EC
 from aiogram import Bot
 from aiogram.types import FSInputFile
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import asyncio
 
+from selenium.webdriver.support.wait import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service as ChromiumService
 from openpyxl import load_workbook
@@ -34,6 +35,7 @@ async def main_search(urls_, message):
     models = []
     memorys = []
     oper_memorys = []
+    sellers = []
 
     arts = []
 
@@ -54,9 +56,10 @@ async def main_search(urls_, message):
         browser.find_element(By.CLASS_NAME, "WidgetButton_widgetButtonOpenIcon__uuM6O").click()
 
     with webdriver.Chrome(options=options_chrome) as browser:
-        url = f'https://www.wildberries.ru/catalog/{arts[3]}/detail.aspx'
+        url = f'https://www.wildberries.ru/catalog/{arts[0]}/detail.aspx'
+
         browser.get(url)
-        await asyncio.sleep(5)
+        await asyncio.sleep(20)
 
         browser.switch_to.window(browser.window_handles[1])
 
@@ -92,6 +95,26 @@ async def main_search(urls_, message):
                 price_no_spp = int(price_no_spp)
             except Exception as err:
                 price_no_spp = None
+
+            await asyncio.sleep(3)
+
+            try:
+                seller_1 = '/html/body/div[1]/main/div[2]/div/div[3]/div/div[3]/div[14]/div/div[1]/div[7]/section/div/div/div/a[1]'
+                seller_2 = '/html/body/div[1]/main/div[2]/div/div[3]/div/div[3]/div[14]/div/div[1]/div[7]/section/div/div/div/a[1]'
+                seller_3 = '//*[@id="1fb3c78a-44a5-beca-91c3-f7645a5ba4cb"]/div[3]/div[14]/div/div[1]/div[7]/section/div/div/div/a[1]'
+                seller_4 = '/html/body/div[1]/main/div[2]/div/div[3]/div/div[3]/div[14]/div/div[1]/div[7]/section/div[2]/div/div/a'
+                seller_5 = '//*[@id="556e436c-ed4f-8855-2b04-97c70477eab3"]/div[3]/div[14]/div/div[1]/div[7]/section/div[2]/div/div/a'
+                # seller = WebDriverWait(browser, 10).until(EC.visibility_of_element_located((By.CLASS_NAME, 'seller-info__name')))
+                seller = browser.find_element(By.XPATH, "/html/body/div[1]/main/div[2]/div/div[3]/div/div[3]/div[14]/div/div[1]/div[7]/section/div[2]/div/div/a/span").text
+                print(seller)
+
+                sellers.append(seller)
+                print(f'seller = {seller}')
+
+            except Exception as err:
+                print('no seller')
+                seller = None
+                sellers.append(None)
 
             try:
                 sold_out = browser.find_element(By.XPATH,
@@ -129,17 +152,6 @@ async def main_search(urls_, message):
                 name = None
                 names.append(None)
 
-
-
-            try:
-                color = browser.find_element(By.XPATH,
-                                             '/html/body/div[1]/main/div[2]/div/div[3]/div/div[3]/div[7]/div[2]/div/div[1]/p/span').text
-                colors.append(color)
-            except Exception as err:
-                color = None
-                print('no color')
-                colors.append(None)
-
             try:
                 model = browser.find_element(By.XPATH,
                                              '/html/body/div[1]/main/div[2]/div/div[3]/div/div[3]/div[10]/div[1]/div[2]/table/tbody/tr[2]/td').text
@@ -149,12 +161,27 @@ async def main_search(urls_, message):
                 model = None
                 models.append(None)
 
+
+
+
             try:
                 time.sleep(3)
                 button = browser.find_element(By.XPATH,
                                               '/html/body/div[1]/main/div[2]/div/div[3]/div/div[3]/div[10]/button').click()
             except Exception as err:
                 print('no button')
+
+            time.sleep(3)
+
+            try:
+                color = browser.find_element(By.CSS_SELECTOR,
+                                             'body > div.popup.popup-product-details.shown > div > div.product-details > div.product-params > table:nth-child(4) > tbody > tr > td').text
+                colors.append(color)
+                print(f'color = {color}')
+            except Exception as err:
+                color = None
+                print('no color')
+                colors.append(None)
 
             try:
                 await asyncio.sleep(3)
@@ -171,6 +198,10 @@ async def main_search(urls_, message):
             except Exception as err:
                 oper_memory = None
                 oper_memorys.append(None)
+
+
+
+
 
     for i in range(len(arts)):
         sheet.cell(row=i + 2, column=1, value=arts[i])
@@ -202,8 +233,11 @@ async def main_search(urls_, message):
     for i in range(len(names)):
         sheet.cell(row=i + 2, column=10, value=names[i])
 
+    for i in range(len(sellers)):
+        sheet.cell(row=i + 2, column=11, value=sellers[i])
+
     for i in range(len(links)):
-        sheet.cell(row=i + 2, column=11, value=links[i])
+        sheet.cell(row=i + 2, column=12, value=links[i])
 
     workbook.save(filename='wb.xlsx')
     file = FSInputFile('wb.xlsx')
