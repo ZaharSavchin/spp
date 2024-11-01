@@ -26,8 +26,9 @@ async def process_start_command(message: Message):
 @router.message(Command(commands='list'))
 async def process_help_command(message: Message, urls_=urls):
     print(urls)
+    await message.answer('следующие ссылки для парсинга:')
     for url in urls:
-        await message.answer(url)
+        await message.answer('\n\n'.join(url))
 
 
 @router.message(lambda message: isinstance(message.text, str))
@@ -35,10 +36,15 @@ async def get_urls(message: Message):
     global urls
     if message.from_user.id in admin_id:
         urls.clear()
-        urls = [item.strip() for item in message.text.split(',')]
+        url_groups = [item.strip() for item in message.text.split(';')]
+        for group in url_groups:
+            urls_g = [item.strip() for item in group.split(',')]
+            urls.append(urls_g)
+
+        # urls = [item.strip() for item in message.text.split(',')]
         await message.answer('Добавлены следующие ссылки для парсинга:')
         for url in urls:
-            await message.answer(url)
+            await message.answer('\n\n'.join(url))
 
 
 
